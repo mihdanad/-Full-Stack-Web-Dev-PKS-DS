@@ -6,7 +6,8 @@ abstract class Hewan {
 	public $keahlian; 
 
 	public function atraksi(){
-
+		$this->nama = nama;
+		$this->kehlian = keahlian;
 	}
 } 
 abstract class Fight {
@@ -14,9 +15,13 @@ abstract class Fight {
 	public $defencePower; 
 
 	public function serang(){
-		public function diserang(){
-
+		$this->nama = nama;
+		 function diserang(){
+		 	$this->darah = darah;
+		 	$this->attackPower = $attackPower;
+		 	$this->$defencePower = $defencePower;
 		}
+
 	}
 } 
 class Elang extends Hewan { 
@@ -39,7 +44,7 @@ class Harimau extends Fight{
 		$this->nama = $nama;
 		$this->keahlian = $keahlian; 
 	} 
-	public function grtInfoHewan(){
+	public function getInfoHewan(){
 		echo "keahlian" . $this->keahlian;
 	} 
 } 
