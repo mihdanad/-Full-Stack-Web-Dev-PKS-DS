@@ -66,7 +66,7 @@ class RoleController extends Controller
 
         //save to database
         $role = Role::create([
-            'name'     => $request->title,
+            'name'     => $request->name
         ]);
 
         //success save to database
@@ -114,7 +114,7 @@ class RoleController extends Controller
 
             //update role
             $role->update([
-                'name'     => $request->title,
+                'name'     => $request->name
             ]);
 
             return response()->json([

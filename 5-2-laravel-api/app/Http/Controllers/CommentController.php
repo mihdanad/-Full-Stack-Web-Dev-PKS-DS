@@ -66,7 +66,7 @@ class CommentController extends Controller
         }
 
         //save to database
-        $comments = Comment::create([
+        $comment = Comment::create([
             'content'     => $request->content,
             'post_id'     => $request->post_id
         ]);
@@ -77,7 +77,7 @@ class CommentController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Comment Created',
-                'data'    => $comments  
+                'data'    => $comment  
             ], 201);
 
         } 
@@ -146,7 +146,7 @@ class CommentController extends Controller
     public function destroy($id)
     {
         //find comment by ID
-        $comments = Comment::findOrfail($id);
+        $comment = Comment::findOrfail($id);
 
         if($comment) {
 
@@ -155,7 +155,7 @@ class CommentController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Post Deleted',
+                'message' => 'Comment Deleted',
             ], 200);
 
         }
