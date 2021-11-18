@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 
-class Users extends Model
+class User extends Model
 {   
     // protected $table = 'users';
 
@@ -17,19 +17,19 @@ class Users extends Model
 
     public $incrementing = false;
 
-    // protected static function boot()
-    // {
-    // 	parent::boot();
+    protected static function boot()
+    {
+    	parent::boot();
 
-    // 	static::creating( function($model){
-    // 		if( empty($model->id) ){
-    // 			$model->id = Str::uuid();
-    // 		}
-    // 	});
-    // }
+    	static::creating( function($model){
+    		if( empty($model->id) ){
+    			$model->id = Str::uuid();
+    		}
+    	});
+    }
 
     public function roles()
     {
-        return $this->belongsTo('App\Roles');
+        return $this->belongsTo('App\Role');
     }
 }
