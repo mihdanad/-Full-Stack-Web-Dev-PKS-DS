@@ -18,9 +18,9 @@ use Illuminate\Http\Request;
 /**
  * route resource post
  */
-Route::apiResource('/post', 'PostController');
+Route::apiResource('/post', 'PostController')->only(['store', 'update', 'destroy'])->midleware('auth');
 Route::apiResource('/role', 'RoleController');
-Route::apiResource('/comment', 'CommentController');
+Route::apiResource('/comment', 'CommentController')->only(['store', 'update', 'destroy'])->midleware('auth');
 
 
 Route::group([
@@ -32,6 +32,7 @@ Route::group([
     Route::post('regenerate-otp-code', 'RegenerateOtpCodeController')->name('auth.regenerate_otp_code');
     Route::post('verification', 'VerificationController')->name('auth.verification');
     Route::post('update-password', 'UpdatePasswordController')->name('auth.update_password');
+    Route::post('login', 'LoginController')->name('auth.login');
 });
 
 
