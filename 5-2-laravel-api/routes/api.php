@@ -23,6 +23,15 @@ Route::apiResource('/role', 'RoleController');
 Route::apiResource('/comment', 'CommentController');
 
 
+Route::group([
+    'prefix' => 'auth',
+    'namespace' => 'Auth'
+], function () {
+
+    Route::post('register', 'RegisterController')->name('auth.register');
+    Route::post('regenerate-otp-code', 'RegenerateOtpCodeController')->name('auth.regenerate_otp_code');
+    Route::post('verification', 'VerificationController')->name('auth.verification');
+});
 
 
 // Route::middleware('auth:api')->get('/user', function (Request $request) {

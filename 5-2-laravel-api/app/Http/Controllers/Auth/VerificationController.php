@@ -2,41 +2,65 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\User;
+use App\OtpCode;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Foundation\Auth\VerifiesEmails;
+use Illuminate\Support\Facades\Validator;
 
 class VerificationController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Email Verification Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller is responsible for handling email verification for any
-    | user that recently registered with the application. Emails may also
-    | be re-sent if the user didn't receive the original email message.
-    |
-    */
-
-    use VerifiesEmails;
-
     /**
-     * Where to redirect users after verification.
+     * Handle the incoming request.
      *
-     * @var string
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
-
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    public function __invoke(Request $request)
     {
-        $this->middleware('auth');
-        $this->middleware('signed')->only('verify');
-        $this->middleware('throttle:6,1')->only('verify', 'resend');
+        $allRequest = $request->all();
+
+        //set validation
+        $validator = Validator::make($allRequest, [
+            'otp'   => 'required',
+        ]);
+
+        //response error validation
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        $otp_code = OtpCode::where('otp', $request->otp)->first();
+
+        if (!$otp_code) {
+            return response()->json([
+                'success' => false,
+                'message' => 'OTP Code Ditemukan'
+            ], 400);
+        }
+
+        $now = Carbon::now();
+
+        if ($now > $otp_code->valid_until) {
+            return response()->json([
+                'success' => false,
+                'message' => 'OTP Tidak Berlaku Lagi'
+            ], 400);
+        }
+
+        $user = User::find($otp_code->user_id);
+        $user->update([
+            'email_verified_at' => $now
+        ]);
+
+
+        $otp_code->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User berhasil diverifikasi',
+            'data' => $user
+        ]);
     }
 }

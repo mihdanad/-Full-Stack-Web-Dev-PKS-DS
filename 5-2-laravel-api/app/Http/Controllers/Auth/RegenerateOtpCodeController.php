@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\User;
+use App\OtpCode;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\OtpCode;
-use App\User;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 
-class RegisterController extends Controller
+class RegenerateOtpCodeController extends Controller
 {
     /**
      * Handle the incoming request.
@@ -19,14 +19,11 @@ class RegisterController extends Controller
      */
     public function __invoke(Request $request)
     {
-
         $allRequest = $request->all();
 
         //set validation
         $validator = Validator::make($allRequest, [
-            'name'   => 'required',
-            'email' => 'required|unique:users,email|email',
-            'username' => 'required|unique:users,username'
+            'email'   => 'required',
         ]);
 
         //response error validation
@@ -34,7 +31,14 @@ class RegisterController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
-        $user = User::create($allRequest);
+        $user = User::where('email', $request->email)->first();
+
+        if ($user->otp_code) {
+            $user->otp_code->delete();
+        }
+
+
+
 
         do {
             $random = mt_rand(100000, 999999);
@@ -55,7 +59,7 @@ class RegisterController extends Controller
 
         return response()->json([
             'succes' => true,
-            'message' => 'Data User Berhasil dibuat',
+            'message' => 'Otp Code Berhasil digenerate',
             'data' => [
                 'user' => $user,
                 'otp_code' => $otp_code

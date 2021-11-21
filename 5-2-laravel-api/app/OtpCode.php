@@ -3,14 +3,15 @@
 namespace App;
 
 use Illuminate\Support\Str;
-
 use Illuminate\Database\Eloquent\Model;
 
-class Role extends Model
+class OtpCode extends Model
 {
-    // protected $table = 'roles';
+    // protected $table = 'otp_codes';
 
-    protected $fillable = ['name', 'id'];
+    protected $fillable = ['otp', 'user_id', 'valid_until'];
+
+    protected $primaryKey = 'id';
 
     protected $keyType = 'string';
 
@@ -26,9 +27,8 @@ class Role extends Model
             }
         });
     }
-
-    public function users()
+    public function user()
     {
-        return $this->hasMany('App\User');
+        return $this->belongsTo('App\User');
     }
 }
