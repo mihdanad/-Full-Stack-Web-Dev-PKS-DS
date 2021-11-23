@@ -27,6 +27,9 @@ class EventServiceProvider extends ServiceProvider
 
         'App\Events\OtpStoredEvent' => [
             'App\Listeners\SendEmailToOtpRegister',
+        ],
+
+        'App\Events\OtpGenerateEvent' => [
             'App\Listeners\SendEmailToOtpRegenerate',
         ],
     ];

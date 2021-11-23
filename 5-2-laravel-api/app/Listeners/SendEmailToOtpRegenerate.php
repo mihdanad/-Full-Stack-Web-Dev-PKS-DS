@@ -2,8 +2,8 @@
 
 namespace App\Listeners;
 
-use App\Events\OtpStoredEvent;
 use App\Mail\OtpRegenerateMail;
+use App\Events\OtpGenerateEvent;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -23,10 +23,10 @@ class SendEmailToOtpRegenerate implements ShouldQueue
     /**
      * Handle the event.
      *
-     * @param  OtpStoredEvent  $event
+     * @param  OtpGenerateEvent  $event
      * @return void
      */
-    public function handle(OtpStoredEvent $event)
+    public function handle(OtpGenerateEvent $event)
     {
         Mail::to($event->otp_code->user->email)->send(new OtpRegenerateMail($event->otp_code));
     }

@@ -6,10 +6,10 @@ use App\User;
 use App\OtpCode;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Events\OtpStoredEvent;
 // use App\Mail\OtpRegenerateMail;
-use App\Http\Controllers\Controller;
+use App\Events\OtpGenerateEvent;
 // use Illuminate\Support\Facades\Mail;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
 class RegenerateOtpCodeController extends Controller
@@ -61,7 +61,7 @@ class RegenerateOtpCodeController extends Controller
         // Mail::to($otp_code->user->email)->send(new OtpRegenerateMail($otp_code));
 
         //kirim otp ke email user dengan event
-        event(new OtpStoredEvent($otp_code));
+        event(new OtpGenerateEvent($otp_code));
 
 
 
