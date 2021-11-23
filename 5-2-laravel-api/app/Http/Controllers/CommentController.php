@@ -3,14 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Comment;
-
+use App\Events\CommentStoredEvent;
+// use App\Mail\PostAuthorMail;
 use Illuminate\Http\Request;
 
+// use App\Mail\CommentAuthorMail;
+// use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class CommentController extends Controller
 {
-   /**
+
+    public function __construct()
+    {
+        return $this->middleware('auth:api')->only(['store', 'update', 'delete']);
+    }
+
+
+    /**
      * index
      *
      * @return void
@@ -24,7 +34,7 @@ class CommentController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'List Data Comment',
-            'data'    => $comments  
+            'data'    => $comments
         ], 200);
     }
 
@@ -43,9 +53,8 @@ class CommentController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Detail Data Comment',
-            'data'    => $comments 
+            'data'    => $comments
         ], 200);
-
     }
 
     /**
@@ -61,7 +70,7 @@ class CommentController extends Controller
             'content'   => 'required',
             'post_id' => 'required',
         ]);
-        
+
         //response error validation
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
@@ -73,23 +82,37 @@ class CommentController extends Controller
             'post_id'     => $request->post_id
         ]);
 
+
+
+        //memanggil event CommentStoredEvent
+        event(new CommentStoredEvent($comment));
+
+
+        //ini yang lama
+
+        // //dikirim kepada yang memiliki post
+        // Mail::to($comment->post->user->email)->send(new PostAuthorMail($comment));
+
+
+        // //dikirim kepada yang memiliki comment atau yang comment di post orang lain
+        // Mail::to($comment->user->email)->send(new CommentAuthorMail($comment));
+
+
         //success save to database
-        if($comment) {
+        if ($comment) {
 
             return response()->json([
                 'success' => true,
                 'message' => 'Comment Created',
-                'data'    => $comment  
+                'data'    => $comment
             ], 201);
-
-        } 
+        }
 
         //failed save to database
         return response()->json([
             'success' => false,
             'message' => 'Comment Failed to Save',
         ], 409);
-
     }
 
     /**
@@ -106,7 +129,7 @@ class CommentController extends Controller
             'content'   => 'required',
             'post_id' => 'required',
         ]);
-        
+
         //response error validation
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
@@ -115,20 +138,28 @@ class CommentController extends Controller
         //find comment by ID
         $comments = Comment::findOrFail($comment->id);
 
-        if($comment) {
+        if ($comment) {
+
+            $user = auth()->user();
+
+            if ($comment->user_id != $user->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal Update Karna data comment bukan milik anda',
+                ], 403);
+            }
 
             //update comment
             $comment->update([
-            'content'     => $request->content,
-            'post_id'     => $request->post_id
+                'content'     => $request->content,
+                'post_id'     => $request->post_id
             ]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Comment Updated',
-                'data'    => $comment  
+                'data'    => $comment
             ], 200);
-
         }
 
         //data comment not found
@@ -136,7 +167,6 @@ class CommentController extends Controller
             'success' => false,
             'message' => 'Comment Not Found',
         ], 404);
-
     }
 
     /**
@@ -150,7 +180,16 @@ class CommentController extends Controller
         //find comment by ID
         $comment = Comment::findOrfail($id);
 
-        if($comment) {
+        if ($comment) {
+
+            $user = auth()->user();
+
+            if ($comment->user_id != $user->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal Delete Karna data comment bukan milik anda',
+                ], 403);
+            }
 
             //delete comment
             $comment->delete();
@@ -159,7 +198,6 @@ class CommentController extends Controller
                 'success' => true,
                 'message' => 'Comment Deleted',
             ], 200);
-
         }
 
         //data comment not found

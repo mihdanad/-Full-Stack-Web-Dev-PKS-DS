@@ -10,6 +10,16 @@ use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
 {
+
+    public function __construct()
+    {
+        return $this->middleware('auth:api')->only(['store', 'update', 'delete']);
+    }
+
+
+
+
+
     /**
      * index
      *
@@ -24,7 +34,7 @@ class PostController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'List Data Post',
-            'data'    => $posts  
+            'data'    => $posts
         ], 200);
     }
 
@@ -43,9 +53,8 @@ class PostController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Detail Data Post',
-            'data'    => $post 
+            'data'    => $post
         ], 200);
-
     }
 
     /**
@@ -61,35 +70,38 @@ class PostController extends Controller
             'title'   => 'required',
             'description' => 'required',
         ]);
-        
+
         //response error validation
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
         }
 
+        //bisa pakai ini
+        // $user = auth()->user();
+
+
         //save to database
         $post = Post::create([
             'title'     => $request->title,
-            'description'   => $request->description
+            'description'   => $request->description,
+            // 'user_id' => $user->id
         ]);
 
         //success save to database
-        if($post) {
+        if ($post) {
 
             return response()->json([
                 'success' => true,
                 'message' => 'Post Created',
-                'data'    => $post  
+                'data'    => $post
             ], 201);
-
-        } 
+        }
 
         //failed save to database
         return response()->json([
             'success' => false,
             'message' => 'Post Failed to Save',
         ], 409);
-
     }
 
     /**
@@ -106,7 +118,7 @@ class PostController extends Controller
             'title'   => 'required',
             'description' => 'required',
         ]);
-        
+
         //response error validation
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
@@ -115,7 +127,18 @@ class PostController extends Controller
         //find post by ID
         $post = Post::findOrFail($post->id);
 
-        if($post) {
+
+        if ($post) {
+
+            $user = auth()->user();
+
+            if ($post->user_id != $user->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal Update Karna data post bukan milik anda',
+                ], 403);
+            }
+
 
             //update post
             $post->update([
@@ -126,9 +149,8 @@ class PostController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Post Updated',
-                'data'    => $post  
+                'data'    => $post
             ], 200);
-
         }
 
         //data post not found
@@ -136,7 +158,6 @@ class PostController extends Controller
             'success' => false,
             'message' => 'Post Not Found',
         ], 404);
-
     }
 
     /**
@@ -150,16 +171,24 @@ class PostController extends Controller
         //find post by ID
         $post = Post::findOrfail($id);
 
-        if($post) {
+        if ($post) {
+
+            $user = auth()->user();
+
+            if ($post->user_id != $user->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal Delete Karna data post bukan milik anda',
+                ], 403);
+            }
 
             //delete post
             $post->delete();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Post Deleted',
+                'message' => 'Post Berhasil Dihapus',
             ], 200);
-
         }
 
         //data post not found
@@ -168,5 +197,4 @@ class PostController extends Controller
             'message' => 'Post Not Found',
         ], 404);
     }
-
 }

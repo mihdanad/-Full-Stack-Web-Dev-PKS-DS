@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Auth;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\OtpCode;
 use App\User;
+use App\OtpCode;
+use Illuminate\Http\Request;
+// use App\Mail\OtpRegisterMail;
+use App\Events\OtpStoredEvent;
 use Illuminate\Support\Carbon;
+use App\Http\Controllers\Controller;
+// use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
@@ -50,6 +53,11 @@ class RegisterController extends Controller
         ]);
 
 
+        //kirim otp ke email user tanpa event
+        // Mail::to($otp_code->user->email)->send(new OtpRegisterMail($otp_code));
+
+        //kirim otp ke email user dengan event
+        event(new OtpStoredEvent($otp_code));
 
 
 

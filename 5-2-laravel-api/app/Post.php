@@ -9,8 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 class Post extends Model
 {
     // protected $table = 'posts';
-    
-    protected $fillable = ['title' , 'description'];
+
+    protected $fillable = ['title', 'description', 'user_id'];
 
     protected $primaryKey = 'id';
 
@@ -20,16 +20,23 @@ class Post extends Model
 
     protected static function boot()
     {
-    	parent::boot();
+        parent::boot();
 
-    	static::creating( function($model){
-    		if( empty($model->{$model->getKeyName()}) ){
-    			$model->{$model->getKeyName()}= Str::uuid();
-    		}
-    	});
+        static::creating(function ($model) {
+            if (empty($model->{$model->getKeyName()})) {
+                $model->{$model->getKeyName()} = Str::uuid();
+            }
+
+
+            $model->user_id = auth()->user()->id;
+        });
     }
-        public function comments()
+    public function comments()
     {
         return $this->hasMany('App\Comment');
+    }
+    public function user()
+    {
+        return $this->belongsTo('App\User');
     }
 }

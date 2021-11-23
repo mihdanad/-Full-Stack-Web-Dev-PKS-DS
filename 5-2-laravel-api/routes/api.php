@@ -18,9 +18,24 @@ use Illuminate\Http\Request;
 /**
  * route resource post
  */
-Route::apiResource('/post', 'PostController')->only(['store', 'update', 'destroy'])->midleware('auth');
+Route::apiResource('/post', 'PostController');
 Route::apiResource('/role', 'RoleController');
-Route::apiResource('/comment', 'CommentController')->only(['store', 'update', 'destroy'])->midleware('auth');
+Route::apiResource('/comment', 'CommentController');
+
+//Middleware cara pertama 
+//cara kedua ada di cntrollernya masing masing
+
+// Route::post('/post', 'PostController@store')->middleware('auth:api');
+// Route::put('/post/(id)', 'PostController@update')->middleware('auth:api');
+// Route::delete('/post/(id)', 'PostController@destroy')->middleware('auth:api');
+
+// Route::post('/comment', 'commentController@store')->middleware('auth:api');
+// Route::put('/comment/(id)', 'commentController@update')->middleware('auth:api');
+// Route::delete('/comment/(id)', 'commentController@destroy')->middleware('auth:api');
+
+
+
+
 
 
 Route::group([
