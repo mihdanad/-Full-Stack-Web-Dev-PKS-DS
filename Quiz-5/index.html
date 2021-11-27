@@ -10,7 +10,7 @@
         <input type="hidden" v-model="user" required="">
 
 		<button onclick="vm.tambah()" v-show="!update">Add</button>
-        <button @click="update" v-show="update">Update</button>
+        <button @click="Update(user)" v-show="update">Update</button>
 		<ul>
 			<li v-for="(user, index) in users">
 				{{ user.name }}  <button @click="edit(user)">Edit</button> || <button @click="deleteUser(user)">Delete</button>
@@ -23,10 +23,9 @@
 		var vm =new Vue({
 			el: '#app',
 			data: {
-                btn: "Add",
-                update: false,
+        update: false,
 				kosong: '',
-                users : [
+        users : [
 				{name: 'Muhammad Iqbal Mubarok'},
 				{name: 'Ruby Purwanti'},
 				{name: 'Faqih Muhammad'},
@@ -36,23 +35,23 @@
 				tambah: function() {
 					this.users.push({name: this.kosong})
 					this.kosong =''
-                },
-                edit: function(user){
-                    this.update = true,
-                    this.kosong = user.name
-
-                },
-                update: function(user) {
-                    this.users.push({name: this.kosong})
-					          this.kosong =''
-                    this.update = false
+        },
+        edit: function(user){
+          this.update = true,
+          this.kosong = user.name
+        },
+        Update: function(user) {
+          this.users.push({name: this.kosong})
+		    	this.kosong =''
+          this.update = false
+          
 				},
-                deleteUser: function(user) {
-                    var tanya = confirm("Anda yakin ?")
+        deleteUser: function(user) {
+          var tanya = confirm("Anda yakin ?")
 
-                    if(tanya === true) {
-                        this.users.splice(this.users.indexOf(user), 1)
-                    }
+          if(tanya === true) {
+            this.users.splice(this.users.indexOf(user), 1)
+          }
 					
 				},
 
