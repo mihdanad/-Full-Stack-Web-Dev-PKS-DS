@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<div id="app">
+		<input type="text" v-model="kosong" required="">
+        <input type="hidden" v-model="user" required="">
+
+		<button onclick="vm.tambah()" v-show="!update">Add</button>
+        <button @click="update" v-show="update">Update</button>
+		<ul>
+			<li v-for="(user, index) in users">
+				{{ user.name }}  <button @click="edit(user)">Edit</button> || <button @click="deleteUser(user)">Delete</button>
+                <br><br>
+            </li>
+		</ul>
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script>
+		var vm =new Vue({
+			el: '#app',
+			data: {
+                btn: "Add",
+                update: false,
+				kosong: '',
+                users : [
+				{name: 'Muhammad Iqbal Mubarok'},
+				{name: 'Ruby Purwanti'},
+				{name: 'Faqih Muhammad'},
+			]
+			},
+			methods: {
+				tambah: function() {
+					this.users.push({name: this.kosong})
+					this.kosong =''
+                },
+                edit: function(user){
+                    this.update = true,
+                    this.kosong = user.name
+
+                },
+                update: function(user) {
+                    this.users.push({name: this.kosong})
+					          this.kosong =''
+                    this.update = false
+				},
+                deleteUser: function(user) {
+                    var tanya = confirm("Anda yakin ?")
+
+                    if(tanya === true) {
+                        this.users.splice(this.users.indexOf(user), 1)
+                    }
+					
+				},
+
+			}
+		})
+	</script>
+</body>
+</html>
