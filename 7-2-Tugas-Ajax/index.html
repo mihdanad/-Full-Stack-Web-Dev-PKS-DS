@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+    <style>
+        form {
+            border: 1px solid rgb(227, 227, 236);
+            padding: 5px;
+            width: 225px;
+            background: rgb(227, 227, 236);
+        }
+
+        label {
+            display: block ;
+            margin-top: 5px;
+        }
+        input, textarea, select, option {
+            min-width: 200px;
+        }
+    </style>
+</head>
+<body>
+  <div id="app">
+    <form @submit.prevent="submitForm()">
+        <p v-if="errors.length">
+            <b>Ikuti aturan!!</b>
+            <ul>
+                <li v-for="error in errors">{{ error }}</li>
+            </ul>
+        </p>
+        <label for="name">Name</label>
+        <input type="text" name="name" v-model="name" ref="name"> 
+        <label for="address">Address</label>
+        <textarea name="address" v-model="address" ref="description"></textarea>
+        <label for="no_hp">No Hp</label>
+        <input type="number" no_hp="no_hp" v-model="no_hp" ref="no_hp"> 
+        <br><br>
+
+
+        <div v-if="buttonStatus == 'kirim'">
+            <input type="submit" value="KIRIM"> 
+        </div>
+        <div v-else-if="buttonStatus == 'update' ">
+            <input type="button" value="UPDATE" @click="updateMember(idEditMember)"> 
+            <input type="button" value="CANCEL" @click="clearForm" style="margin-top: 5px;"> </input>    
+        </div>
+        <div v-else-if="buttonStatus == 'upload' ">
+            <input type="file" name="photo_profile" ref="photo_profile"> 
+            <input type="button" value="UPLOAD" @click="submitPP(idUploadPP)" style="margin-top:5px;">
+            <input type="button" value="CANCEL" @click="clearForm" style="margin-top: 5px;"> </input>    
+        </div>
+
+    </form>
+    <br><br>
+
+    <table border=1>
+        <tr v-for="member of members">
+            <td>
+                <img width="100" src="https://dummyimage.com/16:9x1080" alt="">
+            </td>
+            <td>
+                <b>Name : </b> {{ member.name }}<br>
+                <b>Address : </b> {{ member.address }} <br>
+                <b>No Hp</b> {{ member.no_hp }} <br>
+            </td>
+            <td>
+                <button @click="editMember(member)">Edit</button>
+                <button @click="hapusMember(member.id)">Hapus</button>
+                <button @click="uploadPP(member)">Upload Foto</button>
+            </td>
+        </tr>
+    </table>
+
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <script>
+   var vm = new Vue({
+      el: '#app',
+      data: {
+        name: '',
+        address : '',
+        no_hp: '',
+        errors : [],
+        members : [],
+        buttonStatus : 'kirim',
+        idEditMember : null,
+        idUploadPP : null,
+      },
+      computed : {
+
+      },
+      methods : {
+        validationForm : function(){
+            this.errors = []
+
+            if(this.name.length < 5) {
+                this.errors.push('Name minimal 5')
+                this.$refs.name.focus()
+            }
+
+            if(this.address.length > 50){
+                this.errors.push('Address maksimalmal 50')
+                this.$refs.address.focus()
+            }
+
+        },
+
+        clearForm : function(){
+            this.name = ''
+            this.address = ''
+            this.no_hp = ''
+        },
+
+        submitForm : function(){
+
+            this.validationForm()
+
+            if(this.errors.length === 0){
+
+
+
+
+
+                let formData = new FormData()
+                formData.append('name', this.name)
+                formData.append('address', this.address)
+                formData.append('no_hp', this.no_hp)
+    
+    
+                const config = {
+                    method : "post",
+                    url : "http://demo-api-vue.sanbercloud.com/api/member",
+                    data : formData
+    
+                }
+    
+                axios(config)
+    
+                    .then( (response) => {
+    
+                        this.clearForm()
+                        this.getMembers()
+                        alert('good')
+    
+                    })
+                    .catch( (error) => {
+                        console.log(error)
+                    })
+            }
+
+
+
+        },
+        
+        getMembers : function(){
+
+            const config = {
+                method : "get",
+                url : "http://demo-api-vue.sanbercloud.com/api/member"
+            }
+
+            axios(config)
+
+                .then( (response) => {
+
+                    this.members = response.data.members
+
+                })
+                .catch( (error) => {
+                    console.log(error)
+                })
+
+        },
+
+        hapusMember : function(id) {
+            
+            const config = {
+                method : "post",
+                url : `http://demo-api-vue.sanbercloud.com/api/member/${id}`,
+                params : { _method : "DELETE"}
+            }
+
+            axios(config)
+
+                .then( (response) => {
+
+                    this.getMembers()
+                    alert(response.data.message)
+
+                })
+                .catch( (error) => {
+                    console.log(error)
+                })
+
+            console.log(id)
+        },
+
+        editMember : function(member){
+            this.name = member.name
+            this.address = member.address
+            this.no_hp = member.no_hp
+            this.buttonStatus = 'update'
+            this.idEditMember = member.id
+        },
+
+        clearForm : function(){
+            this.name = ''
+            this.address = ''
+            this.no_hp = ''
+            this.buttonStatus = 'kirim'
+            this.idEditMember = null,
+            this.idUploadPP = null
+        },
+
+        updateMember : function(id){
+
+            this.validationForm()
+
+            if (this.errors.length === 0){
+                let formData = new FormData()
+                formData.append('name', this.name)
+                formData.append('address', this.address)
+                formData.append('no_hp', this.no_hp)
+
+                let config = {
+                    method : "post",
+                    url : `http://demo-api-vue.sanbercloud.com/api/member/${id}`,
+                    params : { _method : 'PUT'},
+                    data : formData
+                }
+                
+                axios(config)
+                .then( (response) => {
+
+                    this.clearForm()
+                    this.getMembers()
+                    
+                    alert(response.data.message)
+
+                })
+                .catch( (error) => {
+                    console.log(error)
+                })
+            }
+        },
+
+
+        uploadPP : function(member){
+            this.name = member.name
+            this.address = member.address
+            this.no_hp = member.no_hp
+            this.buttonStatus = 'upload'
+            this.idUploadPP = member.id
+        },
+
+        submitPP : function(id){
+
+            console.log(id)
+            let file = this.$refs.photo_profile.files[0]
+
+            let formData = new FormData()
+            formData.append('photo_profile', file)
+
+            let config = {
+                    method : "post",
+                    url : `http://demo-api-vue.sanbercloud.com/api/member/${id}/upload-photo-profile`,
+                    data : formData
+    
+                }
+
+                axios(config)
+    
+                    .then( (response) => {
+
+                        this.clearForm()
+                        this.getMembers()
+
+                        alert(response.data.message)
+
+                    })
+                    .catch( (error) => {
+                        console.log(error)
+                    })
+
+        }
+
+      },
+    created(){
+        this.getMembers()
+    }
+  })
+  </script>
+</body>
+</html>
+ 
