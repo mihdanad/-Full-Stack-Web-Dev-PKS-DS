@@ -61,7 +61,7 @@
     <table border=1>
         <tr v-for="member of members">
             <td>
-                <img width="100" src="https://dummyimage.com/16:9x1080" alt="">
+                <img width="100" :src=" member.photo_profile ? domainpp + member.photo_profile : 'https://dummyimage.com/16:9x1080'" alt="">
             </td>
             <td>
                 <b>Name : </b> {{ member.name }}<br>
@@ -93,6 +93,7 @@
         buttonStatus : 'kirim',
         idEditMember : null,
         idUploadPP : null,
+        domainpp : 'http://demo-api-vue.sanbercloud.com'
       },
       computed : {
 
