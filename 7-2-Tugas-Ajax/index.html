@@ -21,6 +21,7 @@
         input, textarea, select, option {
             min-width: 200px;
         }
+
     </style>
 </head>
 <body>
@@ -33,11 +34,11 @@
             </ul>
         </p>
         <label for="name">Name</label>
-        <input type="text" name="name" v-model="name" ref="name"> 
+        <input type="text" :disabled="buttonStatus == 'upload'" name="name" v-model="name" ref="name"> 
         <label for="address">Address</label>
-        <textarea name="address" v-model="address" ref="description"></textarea>
+        <textarea name="address" :disabled="buttonStatus == 'upload'" v-model="address" ref="description"></textarea>
         <label for="no_hp">No Hp</label>
-        <input type="number" no_hp="no_hp" v-model="no_hp" ref="no_hp"> 
+        <input type="number" :disabled="buttonStatus == 'upload'" no_hp="no_hp" v-model="no_hp" ref="no_hp"> 
         <br><br>
 
 
@@ -101,12 +102,12 @@
             this.errors = []
 
             if(this.name.length < 5) {
-                this.errors.push('Name minimal 5')
+                this.errors.push('Name minimal 5 karakter')
                 this.$refs.name.focus()
             }
 
             if(this.address.length > 50){
-                this.errors.push('Address maksimalmal 50')
+                this.errors.push('Address maksimalmal 50 karakter')
                 this.$refs.address.focus()
             }
 
@@ -147,7 +148,7 @@
     
                         this.clearForm()
                         this.getMembers()
-                        alert('good')
+                        alert(response.data.message)
     
                     })
                     .catch( (error) => {
