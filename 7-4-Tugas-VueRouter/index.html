@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+
+    <div id="app">
+  
+        <h1>Tugas Vue Router</h1>
+    
+        <!-- Pengganti tag <a href=""></a>  -->
+        <router-link to="/">Home</router-link>
+        <router-link to="/halaman1">Mobil</router-link>    
+        <router-link to="/halaman3">Contact Me</router-link>        
+        <hr>
+        <!-- Untuk Menampilkan component secara dinamis , sesuai dengan route yang diakses -->
+        <router-view></router-view>
+    </div>
+
+  <script src="https://unpkg.com/vue/dist/vue.js"></script>
+  <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+  <script type="module">
+    import { Component1 } from './Component1.js'
+    import { Component2 } from './Component2.js'
+    import { Component3 } from './Component3.js'
+    // Kita membuat 2 component , yaitu Home dan About
+    const Home = { template: '<div>Ini Halaman Home</div>' }
+
+    // Kemudian kita arahkan setiap route ke component yang kita inginkan
+    const routes = [
+    { path: '/', component: Home , alias: '/home'},
+    { path: '/halaman1', component: Component1  },
+    { path: '/halaman1/:id', component: Component2, meta: {login: true } },
+    { path: '/halaman3', component: Component3, meta: {login: true } },
+    { path: '*', redirect: '/' }
+    ]
+
+    //Kemudian kita instansiasi object Vue Router dan tambahkan routes yang sudah kita buat tadi
+    const router = new VueRouter({
+    routes 
+    })
+
+    //Nav Guard
+    router.beforeEach((to, from, next) => {
+        if (to.matched.some(record => record.meta.login)) {
+          let user = {
+              login : true,
+              role : 'admin'
+            }
+            if(user.role != 'admin' ){
+            alert('anda masuk')
+            next()
+            }
+            else{
+               next()
+                alert('Berhasil Login') 
+            }
+            
+        }
+        else{
+            next()
+        }
+    })
+
+    //Kemudian kita tambahkan object VueRouter yang kita namakan router ke object Vue
+
+    var vm = new Vue({ 
+    el: '#app', 
+    router, 
+    })
+  </script>
+ 
+</body>
+</html>
